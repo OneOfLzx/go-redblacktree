@@ -1,3 +1,3 @@
-module github.com/oneoflzx/go-redblacktree
+module github.com/OneOfLzx/go-redblacktree
 
 go 1.19
