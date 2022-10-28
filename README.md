@@ -2,6 +2,7 @@
 用GO语言实现的红黑树，可做工具库直接调用
 ## 类和接口介绍
 `RedBlackTreeNodeValEntry:` 封装节点存的数据的接口  
+`NodeValueEntryComparator:` 节点数据的比较器  
 Equal(): 判断两个数据是否相等  
 Smaller()：判断数据是否小于  
 `RedBlackTreeNode:` 红黑树的节点  

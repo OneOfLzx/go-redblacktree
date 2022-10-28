@@ -1,7 +1,8 @@
 package go_redblacktree
 
 type RedBlackTree struct {
-	root *RedBlackTreeNode
+	root       *RedBlackTreeNode
+	Comparator NodeValueEntryComparator
 }
 
 // findReturnLastNode: if it finds a node has the same value, return this node. Otherwise, return
@@ -11,9 +12,9 @@ func (tree *RedBlackTree) findReturnLastNode(val RedBlackTreeNodeValEntry) (node
 OuterLoop:
 	for {
 		switch {
-		case n.val.Equal(val):
+		case tree.Comparator.Equal(n.val, val):
 			return n, true
-		case n.val.Smaller(val):
+		case tree.Comparator.Smaller(n.val, val):
 			if nil == n.rightChild {
 				break OuterLoop
 			}
@@ -30,7 +31,7 @@ OuterLoop:
 
 // FindNode return a node has the same value. If not found, return nil
 func (tree *RedBlackTree) FindNode(val RedBlackTreeNodeValEntry) (node *RedBlackTreeNode, ok bool) {
-	if nil == tree.root || nil == val {
+	if nil == tree.root || nil == tree.Comparator || nil == val {
 		return nil, false
 	}
 
@@ -44,6 +45,10 @@ func (tree *RedBlackTree) FindNode(val RedBlackTreeNodeValEntry) (node *RedBlack
 // AddNode add a new node to the tree, then return the new node and whether add operation is successful or not.
 // If the value is already exit, return the exit node
 func (tree *RedBlackTree) AddNode(val RedBlackTreeNodeValEntry) (node *RedBlackTreeNode, ok bool) {
+	if nil == tree.Comparator {
+		return nil, false
+	}
+
 	if nil == tree.root {
 		tree.root = &RedBlackTreeNode{
 			val:   val,
@@ -61,7 +66,7 @@ func (tree *RedBlackTree) AddNode(val RedBlackTreeNodeValEntry) (node *RedBlackT
 		val:    val,
 		color:  RedBlackTreeNodeColorRed,
 	}
-	if n.val.Smaller(val) {
+	if tree.Comparator.Smaller(n.val, val) {
 		n.rightChild = &newN
 	} else {
 		n.leftChild = &newN

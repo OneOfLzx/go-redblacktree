@@ -44,12 +44,16 @@ type testRedBlackTreeNodeValEntry struct {
 	val int
 }
 
-func (e testRedBlackTreeNodeValEntry) Equal(b RedBlackTreeNodeValEntry) bool {
-	return e.val == (b.(testRedBlackTreeNodeValEntry)).val
+type testNodeValueEntryComparator struct {
+	NodeValueEntryComparator
 }
 
-func (e testRedBlackTreeNodeValEntry) Smaller(b RedBlackTreeNodeValEntry) bool {
-	return e.val < (b.(testRedBlackTreeNodeValEntry)).val
+func (c testNodeValueEntryComparator) Equal(v1 RedBlackTreeNodeValEntry, v2 RedBlackTreeNodeValEntry) bool {
+	return v1.(testRedBlackTreeNodeValEntry).val == v2.(testRedBlackTreeNodeValEntry).val
+}
+
+func (c testNodeValueEntryComparator) Smaller(v1 RedBlackTreeNodeValEntry, v2 RedBlackTreeNodeValEntry) bool {
+	return v1.(testRedBlackTreeNodeValEntry).val < v2.(testRedBlackTreeNodeValEntry).val
 }
 
 func TestRedBlackTree(t *testing.T) {
@@ -65,7 +69,9 @@ func TestRedBlackTree(t *testing.T) {
 	opCounts = rand.Intn(opCounts) + minOpPerTree
 OuterLoop:
 	for tIdx := 0; tIdx < testTreeNum; tIdx++ {
-		tree := RedBlackTree{}
+		tree := RedBlackTree{
+			Comparator: testNodeValueEntryComparator{},
+		}
 		addTimes, removeTimes, findTimes := 0, 0, 0
 		for i := 0; i < opCounts; i++ {
 			entry := testRedBlackTreeNodeValEntry{val: rand.Intn(maxTestNum) + minTestNum}
@@ -79,7 +85,7 @@ OuterLoop:
 			case 2:
 				n, ok := tree.FindNode(entry)
 				if ok {
-					if !n.val.Equal(entry) {
+					if n.val.(testRedBlackTreeNodeValEntry).val != entry.val {
 						t.Error("tree ", tIdx, " Find return ok but val is not equal")
 					}
 				} else {
@@ -109,7 +115,7 @@ func checkRedBlackTreeBlackChildCountsAndRedChild(root *RedBlackTreeNode) (int, 
 		return -1, RedBlackTreeErrorInvalidColor
 	}
 	if nil != root.leftChild {
-		if !root.leftChild.val.Smaller(root.val) {
+		if root.leftChild.val.(testRedBlackTreeNodeValEntry).val >= root.val.(testRedBlackTreeNodeValEntry).val {
 			return -1, RedBlackTreeErrorLeftChildValNotSmaller
 		}
 
@@ -123,7 +129,7 @@ func checkRedBlackTreeBlackChildCountsAndRedChild(root *RedBlackTreeNode) (int, 
 		}
 	}
 	if nil != root.rightChild {
-		if !root.val.Smaller(root.rightChild.val) {
+		if root.val.(testRedBlackTreeNodeValEntry).val >= root.rightChild.val.(testRedBlackTreeNodeValEntry).val {
 			return -1, RedBlackTreeErrorRightChildValNotBigger
 		}
 

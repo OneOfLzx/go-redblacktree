@@ -8,11 +8,15 @@ const (
 	RedBlackTreeNodeColorRed
 )
 
-// RedBlackTreeNodeValEntry is the value wrapper of RedBlackTreeNode, whitch need to
-// implement the comparison operator
-type RedBlackTreeNodeValEntry interface {
-	Equal(b RedBlackTreeNodeValEntry) bool
-	Smaller(b RedBlackTreeNodeValEntry) bool
+// RedBlackTreeNodeValEntry is the value wrapper of RedBlackTreeNode
+type RedBlackTreeNodeValEntry interface{}
+
+// NodeValueEntryComparator is the comparator that can compara RedBlackTreeNodeValEntry
+type NodeValueEntryComparator interface {
+	// Equal return if v1==v2
+	Equal(v1 RedBlackTreeNodeValEntry, v2 RedBlackTreeNodeValEntry) bool
+	// Smaller return if v1<v2
+	Smaller(v1 RedBlackTreeNodeValEntry, v2 RedBlackTreeNodeValEntry) bool
 }
 
 // RedBlackTreeNode the node of Red-Black-Tree
@@ -25,7 +29,7 @@ type RedBlackTreeNode struct {
 }
 
 // IsValidNode checks if this node valid
-func (node RedBlackTreeNode) IsValidNode() bool {
+func (node *RedBlackTreeNode) IsValidNode() bool {
 	if RedBlackTreeNodeColorRed == node.color || RedBlackTreeNodeColorBlack == node.color {
 		return true
 	}
@@ -33,7 +37,7 @@ func (node RedBlackTreeNode) IsValidNode() bool {
 }
 
 // Value return value of the node if node is valid
-func (node RedBlackTreeNode) Value() RedBlackTreeNodeValEntry {
+func (node *RedBlackTreeNode) Value() RedBlackTreeNodeValEntry {
 	if !node.IsValidNode() {
 		return nil
 	}
@@ -41,7 +45,7 @@ func (node RedBlackTreeNode) Value() RedBlackTreeNodeValEntry {
 }
 
 // PrevNode return the previous node by Inorder Traversal
-func (node RedBlackTreeNode) PrevNode() *RedBlackTreeNode {
+func (node *RedBlackTreeNode) PrevNode() *RedBlackTreeNode {
 	if !node.IsValidNode() {
 		return nil
 	}
@@ -52,10 +56,10 @@ func (node RedBlackTreeNode) PrevNode() *RedBlackTreeNode {
 		for nil != prevNode.rightChild {
 			prevNode = prevNode.rightChild
 		}
-	case nil != node.parent && &node == node.parent.rightChild:
+	case nil != node.parent && node == node.parent.rightChild:
 		prevNode = node.parent
 	default:
-		n := &node
+		n := node
 		for nil != n.parent {
 			if n == n.parent.rightChild {
 				prevNode = n.parent
@@ -68,7 +72,7 @@ func (node RedBlackTreeNode) PrevNode() *RedBlackTreeNode {
 }
 
 // NextNode return the next node by Inorder Traversal
-func (node RedBlackTreeNode) NextNode() *RedBlackTreeNode {
+func (node *RedBlackTreeNode) NextNode() *RedBlackTreeNode {
 	if !node.IsValidNode() {
 		return nil
 	}
@@ -80,7 +84,7 @@ func (node RedBlackTreeNode) NextNode() *RedBlackTreeNode {
 			nextNode = nextNode.leftChild
 		}
 	default:
-		n := &node
+		n := node
 		for nil != n.parent {
 			if n == n.parent.leftChild {
 				nextNode = n.parent
